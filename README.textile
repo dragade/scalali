@@ -53,4 +53,10 @@ h2. Playing with the Example in SBT
 
 > compile
 > console
-scala> :load demo.scala
+scala> :load src/scripts/demo.scala
+
+
+h2. To build the jar
+> publish
+
+the jar is target/scala-2.9.1/scalali_2.9.1-1.0.jar

@@ -12,8 +12,6 @@ import org.scribe.model._
  */
 class ScalaLi(apiKey: String, secretKey: String, callbackUrl: Option[String] = None) {
 
-  import ScalaLi._
-
   val oauthService = buildOathService(apiKey, secretKey, callbackUrl)
 
   /**
@@ -38,17 +36,21 @@ class ScalaLi(apiKey: String, secretKey: String, callbackUrl: Option[String] = N
     (accessToken.getToken, accessToken.getSecret)
   }
 
-  // just gets my profile info and displays the XML data
-  def myProfile(accessToken:String, accessTokenSecret:String) : String = {
+  /**
+   * Queries for your profile and returns a Person object if it gets back profile data for you
+   */
+  def myProfile(accessToken:String, accessTokenSecret:String) : Option[Person] = {
     val restUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url)"
     val apiResponse = makeApiCall(accessToken, accessTokenSecret, restUrl)
-    apiResponse
+    val people = Person.parsePeopleXml(apiResponse)
+    people.headOption
   }
 
   /**
-   * Recreates the access token, and signs a request for the given resource, returns the raw response body
+   * Recreates the access token, and signs a request for the given resource, returns the raw response body.
+   * This method is exposed so you can directly use things from the linkedin REST API not covered by ScalaLi
    */
-  private def makeApiCall(accessToken:String, accessTokenSecret:String, restUrl: String) : String = {
+  def makeApiCall(accessToken:String, accessTokenSecret:String, restUrl: String) : String = {
     val orequest: OAuthRequest = new OAuthRequest(Verb.GET, restUrl);
     oauthService.signRequest(new Token(accessToken, accessTokenSecret), orequest);
     val oresponse: Response = orequest.send();
@@ -68,6 +70,4 @@ class ScalaLi(apiKey: String, secretKey: String, callbackUrl: Option[String] = N
     }
     builder.build()
   }
-}
-object ScalaLi {
 }
