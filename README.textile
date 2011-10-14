@@ -1,0 +1,56 @@
+h2. scalali
+
+A scala wrapper for the linkedin REST APIs.
+
+This makes using the LinkedIn REST APIs easier.
+
+It uses scribe for oauth internally, and handles the authentication, request signing, parsing requests,
+and returns scala objects in scala collections.
+
+h2. APIs supported
+
+So far the APIs supported include:
+* Authentication
+* Profile
+
+h2. To run
+
+
+First get your API keys from http://developer.linkedin.com
+You can edit demo.scala to use them for playing with the demo, but otherwise you'll pass these
+into ScalaLi
+
+Then get sbt 0.11.0
+from https://github.com/harrah/xsbt
+
+Follow the instructions for creating the sbt runner script:
+https://github.com/harrah/xsbt/wiki/Setup
+
+sbt
+
+The first time you run sbt it will download its own copy of scala 2.9.1, plus other stuff it needs.
+This is separate from the version of scala you're using yourself. Don't worry about it.
+
+h2. Setting up IntelliJ
+
+First create a file called ~/.sbt/plugins/build.sbt
+with:
+resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
+
+addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "0.11.0")
+
+h2. Playing with the examples
+
+Once you're in sbt, you can do:
+> gen-idea
+
+this will generate the .idea files and you can then open the project in IntelliJ.
+If you have the sbt plugin in IntelliJ, you can just click the green play button
+to start up sbt in IntelliJ.
+
+
+h2. Playing with the Example in SBT
+
+> compile
+> console
+scala> :load demo.scala
