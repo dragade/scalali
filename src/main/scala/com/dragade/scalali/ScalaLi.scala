@@ -14,6 +14,8 @@ class ScalaLi(apiKey: String, secretKey: String, callbackUrl: Option[String] = N
 
   val oauthService = buildOathService(apiKey, secretKey, callbackUrl)
 
+  private val API_SERVER = "http://api.linkedin.com/v1"
+
   /**
    * Before using ScalaLI, you need to call intialize(), then go to that URL to authenticate, then pass
    * the oauth token and oauth_verifier you get back into the verify call.
@@ -40,10 +42,25 @@ class ScalaLi(apiKey: String, secretKey: String, callbackUrl: Option[String] = N
    * Queries for your profile and returns a Person object if it gets back profile data for you
    */
   def myProfile(accessToken:String, accessTokenSecret:String) : Option[Person] = {
-    val restUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url)"
+    val restUrl = "%s/people/~:(%s)".format(API_SERVER, Person.DEFAULT_PROFILE_FIELDS)
+    parsePeople(accessToken, accessTokenSecret, restUrl).headOption
+  }
+
+  /**
+   * Queries for your connections and returns a Seq of people
+   */
+  def myConnections(accessToken:String, accessTokenSecret:String) : Seq[Person] = {
+    val restUrl = "%s/people/~/connections:(%s)".format(API_SERVER, Person.DEFAULT_PROFILE_FIELDS)
+    parsePeople(accessToken, accessTokenSecret, restUrl)
+  }
+
+  /**
+   * Calls the API with the URL and parsers the resulting xml into a Seq of People
+   */
+  def parsePeople(accessToken:String, accessTokenSecret:String, restUrl:String) : Seq[Person] = {
+    if (restUrl.endsWith("json")) { throw new Exception("Sorry but json responses are not supported") }
     val apiResponse = makeApiCall(accessToken, accessTokenSecret, restUrl)
-    val people = Person.parsePeopleXml(apiResponse)
-    people.headOption
+    Person.parsePeopleXml(apiResponse)
   }
 
   /**
