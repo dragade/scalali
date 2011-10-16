@@ -7,6 +7,7 @@
 
 println("ScalaLi demo")
 import com.dragade.scalali.ScalaLi
+import com.dragade.scalali.Person
 import java.util.Scanner
 
 // get your API keys from http://developer.linkedin.com
@@ -14,17 +15,22 @@ val apiKey = ""
 val secretKey = ""
 
 val scalali = new ScalaLi(apiKey, secretKey)
-val (url,requestToken, requestSecret) = scalali.initialize()
-println()
-println()
-println("Go hit URL %s and then come back with the verifier code.".format(url))
+val (url, requestToken) = scalali.initialize()
+println("\n\nGo hit URL %s and then come back with the verifier code.".format(url))
 print("Verifier: ")
 
 val verifier = (new Scanner(System.in)).next
-println()
-println("Using verifier " + verifier)
-val (accessToken,accessSecret) = scalali.verify(requestToken,requestSecret,verifier)
+println("\nUsing verifier " + verifier)
+val accessToken = scalali.verify(requestToken,verifier)
 
-println("Fetching your profile")
-println()
-val myProfile = scalali.myProfile(accessToken,accessSecret)
+println("\nFetching your profile\n")
+val myProfile = scalali.myProfile(accessToken)
+myProfile match {
+  case None => println("No profile found for you!")
+  case Some(p) => println("Name: %s %s".format(p.firstName, p.lastName))
+}
+
+println("Fetching your connections and partitioning into those with pics and headlines and those without\n")
+val conns = scalali.myConnections(accessToken)
+val (complete, incomplete) = conns.partition(p => p.picture.isDefined &&  p.headline.isDefined)
+complete.foreach(p => println("Name:%s %s\t%s\t%s".format(p.firstName, p.lastName, p.headline.get, p.picture.get)))

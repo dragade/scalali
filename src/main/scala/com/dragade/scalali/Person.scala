@@ -5,14 +5,7 @@ import xml.XML
 /**
  * Simple class to hold person info
  */
-case class Person(val firstName: String, val lastName: String, val picture: String, val headline: String) {
-
-  def hasPicture = hasX(picture)
-
-  def hasHeadline = hasX(headline)
-
-  private def hasX(x: String) = x != null && ! x.isEmpty
-}
+case class Person(val id:String, val firstName: String, val lastName: String, val picture: Option[String], val headline: Option[String])
 
 object Person {
 
@@ -24,12 +17,19 @@ object Person {
   def parsePeopleXml(apiResponse: String) : Seq[Person] = {
     val xml = XML.loadString(apiResponse)
     val people = xml \\ "person"
+
     people.map(p => {
+      val id = (p \ "id").text
       val firstName = (p \ "first-name").text
       val lastName = (p \ "last-name").text
-      val picture = (p \ "picture-url").text
-      val headline = (p \ "headline").text
-      Person(firstName, lastName, picture, headline)
+      val picture = maybe((p \ "picture-url").text)
+      val headline = maybe((p \ "headline").text)
+      Person(id, firstName, lastName, picture, headline)
     })
   }
+
+  /**
+   * If the string is empty or null, makes it an Option
+   */
+  private def maybe(s:String) : Option[String] = if (s == null || s.isEmpty) None else Some(s)
 }

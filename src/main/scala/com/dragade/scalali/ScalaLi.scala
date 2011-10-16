@@ -19,47 +19,47 @@ class ScalaLi(apiKey: String, secretKey: String, callbackUrl: Option[String] = N
   /**
    * Before using ScalaLI, you need to call intialize(), then go to that URL to authenticate, then pass
    * the oauth token and oauth_verifier you get back into the verify call.
-   * Returns the url, requestToken, and requestTokenSecret
+   * Returns the url and requestToken
    */
-  def initialize() : (String, String, String) = {
+  def initialize() : (String, RequestToken) = {
     val requestToken = oauthService.getRequestToken()
     val url = oauthService.getAuthorizationUrl(requestToken)
-    (url, requestToken.getToken, requestToken.getSecret)
+    (url, RequestToken(requestToken.getToken, requestToken.getSecret))
   }
 
   /**
    * The client needs to hit the authorization URL and then enter in the verifier code that is returned
-   * along with the requestToken and requestTokenSecret that were returned from initialize()
+   * along with the requestToken that was returned from initialize()
    */
-  def verify(requestToken: String, requestTokenSecret: String, oauthVerifier: String) : (String,String) = {
+  def verify(requestToken: RequestToken, oauthVerifier: String) : AccessToken = {
     val accessToken = oauthService.getAccessToken(
-      new Token(requestToken, requestTokenSecret),
+      new Token(requestToken.token, requestToken.secret),
       new Verifier(oauthVerifier));
-    (accessToken.getToken, accessToken.getSecret)
+    AccessToken(accessToken.getToken, accessToken.getSecret)
   }
 
   /**
    * Queries for your profile and returns a Person object if it gets back profile data for you
    */
-  def myProfile(accessToken:String, accessTokenSecret:String) : Option[Person] = {
+  def myProfile(accessToken: AccessToken) : Option[Person] = {
     val restUrl = "%s/people/~:(%s)".format(API_SERVER, Person.DEFAULT_PROFILE_FIELDS)
-    parsePeople(accessToken, accessTokenSecret, restUrl).headOption
+    parsePeople(accessToken, restUrl).headOption
   }
 
   /**
    * Queries for your connections and returns a Seq of people
    */
-  def myConnections(accessToken:String, accessTokenSecret:String) : Seq[Person] = {
+  def myConnections(accessToken: AccessToken) : Seq[Person] = {
     val restUrl = "%s/people/~/connections:(%s)".format(API_SERVER, Person.DEFAULT_PROFILE_FIELDS)
-    parsePeople(accessToken, accessTokenSecret, restUrl)
+    parsePeople(accessToken, restUrl)
   }
 
   /**
    * Calls the API with the URL and parsers the resulting xml into a Seq of People
    */
-  def parsePeople(accessToken:String, accessTokenSecret:String, restUrl:String) : Seq[Person] = {
+  def parsePeople(accessToken: AccessToken, restUrl:String) : Seq[Person] = {
     if (restUrl.endsWith("json")) { throw new Exception("Sorry but json responses are not supported") }
-    val apiResponse = makeApiCall(accessToken, accessTokenSecret, restUrl)
+    val apiResponse = makeApiCall(accessToken, restUrl)
     Person.parsePeopleXml(apiResponse)
   }
 
@@ -67,9 +67,9 @@ class ScalaLi(apiKey: String, secretKey: String, callbackUrl: Option[String] = N
    * Recreates the access token, and signs a request for the given resource, returns the raw response body.
    * This method is exposed so you can directly use things from the linkedin REST API not covered by ScalaLi
    */
-  def makeApiCall(accessToken:String, accessTokenSecret:String, restUrl: String) : String = {
+  def makeApiCall(accessToken:AccessToken, restUrl: String) : String = {
     val orequest: OAuthRequest = new OAuthRequest(Verb.GET, restUrl);
-    oauthService.signRequest(new Token(accessToken, accessTokenSecret), orequest);
+    oauthService.signRequest(new Token(accessToken.token, accessToken.secret), orequest);
     val oresponse: Response = orequest.send();
     oresponse.getBody();
   }
@@ -88,3 +88,12 @@ class ScalaLi(apiKey: String, secretKey: String, callbackUrl: Option[String] = N
     builder.build()
   }
 }
+
+/**
+ * Creating two separate classes to wrap the token and secret parts for both
+ * request tokens and access tokens.
+ * Scribe uses the same Token class for both and this can cause confusion.
+ * Plus we don't want to expose Scribe through the ScalaLi API
+ */
+case class RequestToken(token:String,secret:String)
+case class AccessToken(token:String,secret:String)
