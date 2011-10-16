@@ -12,6 +12,7 @@ h2. APIs supported
 So far the APIs supported include:
 * Authentication
 * Profile
+* Connections
 
 h2. To run
 
