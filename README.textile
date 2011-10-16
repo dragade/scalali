@@ -7,6 +7,8 @@ This makes using the LinkedIn REST APIs easier.
 It uses scribe for oauth internally, and handles the authentication, request signing, parsing requests,
 and returns scala objects in scala collections.
 
+(Note, uses the great scribe-java library from https://github.com/fernandezpablo85/scribe-java)
+
 h2. APIs supported
 
 So far the APIs supported include:
