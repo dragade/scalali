@@ -15,6 +15,7 @@ So far the APIs supported include:
 * Authentication
 * Profile
 * Connections
+* Voldemort API
 
 h2. To run
 
