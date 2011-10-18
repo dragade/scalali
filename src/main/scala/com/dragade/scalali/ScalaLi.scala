@@ -75,6 +75,19 @@ class ScalaLi(apiKey: String, secretKey: String, callbackUrl: Option[String] = N
   }
 
   /**
+   * Makes a voldemort API call for the given store and set of keys and format.
+   * The format must be xml or json.
+   * Only works if you have permissions to use the API
+   */
+  def voldemort(accessToken: AccessToken,  storeName: String, keys: Set[String], format : String = "json") = {
+    val restFormat = if (format != null && format.toLowerCase.equals("xml")) { "xml" } else { "json" }
+    val csvKeys = keys.mkString(",")
+    val restUrlPattern = "%s/voldemort/stores/%s/values::(%s)?format=%s"
+    val restUrl = restUrlPattern.format(API_SERVER, storeName, csvKeys, restFormat)
+    makeApiCall(accessToken, restUrl)
+  }
+
+  /**
    * Builds up a builder and then uses it to create the oauth service
    */
   private def buildOathService(apiKey: String, secretKey: String, callbackUrl: Option[String] = None): OAuthService = {

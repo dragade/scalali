@@ -34,3 +34,6 @@ println("Fetching your connections and partitioning into those with pics and hea
 val conns = scalali.myConnections(accessToken)
 val (complete, incomplete) = conns.partition(p => p.picture.isDefined &&  p.headline.isDefined)
 complete.foreach(p => println("Name:%s %s\t%s\t%s".format(p.firstName, p.lastName, p.headline.get, p.picture.get)))
+
+//Make a call to the volemort API if you have permissions
+//scalali.voldemort(accessToken, "twitterHandles", Set("dragade","larryyuan"))
