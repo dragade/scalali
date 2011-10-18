@@ -36,4 +36,4 @@ val (complete, incomplete) = conns.partition(p => p.picture.isDefined &&  p.head
 complete.foreach(p => println("Name:%s %s\t%s\t%s".format(p.firstName, p.lastName, p.headline.get, p.picture.get)))
 
 //Make a call to the volemort API if you have permissions
-//scalali.voldemort(accessToken, "twitterHandles", Set("dragade","larryyuan"))
+//scalali.voldemort(accessToken, "some-store", Set("key1","key2"))

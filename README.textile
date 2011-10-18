@@ -17,8 +17,27 @@ So far the APIs supported include:
 * Connections
 * Voldemort API
 
-h2. To run
+h2. How to use it?
 
+A snippet from: src/scripts/demo.scala
+
+import com.dragade.scalali._
+
+val scalali = new ScalaLi(apiKey, secretKey)
+val (url, requestToken) = scalali.initialize()
+val accessToken = scalali.verify(requestToken,verifier)
+val myProfile = scalali.myProfile(accessToken)
+myProfile match {
+  case None => println("No profile found for you!")
+  case Some(p) => println("Name: %s %s".format(p.firstName, p.lastName))
+}
+
+//partition connections into those with pics&headlines and those without
+val conns = scalali.myConnections(accessToken)
+val (complete, incomplete) = conns.partition(p => p.picture.isDefined &&  p.headline.isDefined)
+complete.foreach(p => println("Name:%s %s\t%s\t%s".format(p.firstName, p.lastName, p.headline.get, p.picture.get)))
+
+h2. To run
 
 First get your API keys from http://developer.linkedin.com
 You can edit demo.scala to use them for playing with the demo, but otherwise you'll pass these
