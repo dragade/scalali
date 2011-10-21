@@ -9,6 +9,8 @@ and returns scala objects in scala collections.
 
 (Note, uses the great scribe-java library from https://github.com/fernandezpablo85/scribe-java)
 
+If you want an overview, see the presentation at: http://prezi.com/1y9kflmo2wnz/scalali/ 
+
 h2. APIs supported
 
 So far the APIs supported include:
