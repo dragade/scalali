@@ -5,10 +5,9 @@ import xml.XML
 /**
  * Simple class to hold person info
  */
-case class Person(val id:String, val firstName: String, val lastName: String, val picture: Option[String], val headline: Option[String])
+case class Person(id:String, firstName: String, lastName: String, picture: Option[String], headline: Option[String])
 
 object Person {
-
   val DEFAULT_PROFILE_FIELDS = "id,first-name,last-name,picture-url,headline"
 
   /**
